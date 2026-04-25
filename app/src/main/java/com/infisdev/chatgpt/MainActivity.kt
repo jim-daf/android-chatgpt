@@ -57,7 +57,19 @@ class MainActivity : AppCompatActivity() {
             settings.apply {
                 javaScriptEnabled = true
                 cacheMode = WebSettings.LOAD_DEFAULT
+                // Issue #1: present a stable Chrome user-agent so
+                // alternative system WebViews (Bromite and similar) are
+                // not flagged as bot traffic by Cloudflare. Without this
+                // the login page either never paints or comes back blank.
+                userAgentString =
+                    "Mozilla/5.0 (Linux) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                    "Chrome/124.0.0.0 Safari/537.36"
             }
+            // Cloudflare's challenge sets cf_clearance as a third-party
+            // cookie. Without this call the cookie is silently dropped on
+            // hardened WebView builds and the user is stuck on the
+            // verification screen.
+            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
             webViewClient = object : WebViewClient() {
                 override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                     linearProgressIndicator.isVisible = true

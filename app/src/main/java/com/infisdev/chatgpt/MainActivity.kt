@@ -57,6 +57,12 @@ class MainActivity : AppCompatActivity() {
             settings.apply {
                 javaScriptEnabled = true
                 cacheMode = WebSettings.LOAD_DEFAULT
+                // Issue #2: Cloudflare's interstitial uses localStorage
+                // and IndexedDB to hold its cf_clearance state. Without
+                // these flags the WebView fails the challenge silently
+                // and the page reappears on the captcha screen.
+                domStorageEnabled = true
+                databaseEnabled = true
             }
             webViewClient = object : WebViewClient() {
                 override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
